@@ -297,6 +297,8 @@
                     <configuration>
                         <user>${crx.username}</user>
                         <password>${crx.password}</password>
+                        <slingUrl>http://${crx.host}:${crx.port}</slingUrl>
+                        <slingUrlSuffix>/system/console</slingUrlSuffix>
                     </configuration>
                 </plugin>
                 <!-- for building content packages -->
@@ -456,7 +458,7 @@
                                     <version>3.6.1</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <version>${maven.compiler.release}</version>
+                                    <version>11</version>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>
@@ -541,9 +543,6 @@
                                     </goals>
                                 </execution>
                             </executions>
-                            <configuration>
-                                <slingUrl>http://${crx.host}:${crx.port}/apps/netcentric/actool/install</slingUrl>
-                            </configuration>
                         </plugin>
                     </plugins>
                 </pluginManagement>
