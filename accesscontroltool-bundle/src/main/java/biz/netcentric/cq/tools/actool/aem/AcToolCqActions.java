@@ -30,7 +30,16 @@ import com.day.cq.replication.Replicator;
 import biz.netcentric.cq.tools.actool.configmodel.AceBean;
 import biz.netcentric.cq.tools.actool.helper.AccessControlUtils;
 
-/** Mimics the behaviour of the now deprecated <a href="https://www.adobe.io/experience-manager/reference-materials/6-5/javadoc/com/day/cq/security/util/CqActions.html">CqActions</a> class (behaviour should be in line with cq-security-5.6.2.)  */
+/** Mimics the behaviour of the now deprecated <a href="https://www.adobe.io/experience-manager/reference-materials/6-5/javadoc/com/day/cq/security/util/CqActions.html">CqActions</a> class (behaviour should be in line with cq-security-5.6.2.)
+ * CqActions are an abstraction on top of JCR privileges to act on Page level (i.e. dedicated privileges for some node types).
+ * 
+ * This requires handling ACEs on two logical levels (they are maintained in the same ACList, but one is having a {@code rep:glob} restriction):
+ * <ol>
+ * <li>top level for the rights which apply to all nodes (sub pages as well as page content nodes)</li>
+ * <li>jcr:content level restrictions for the rights which apply only to nodes within the page content</li>
+ * </ol>
+ * 
+ */
 public class AcToolCqActions {
 
     private static final Logger LOG = LoggerFactory.getLogger(AcToolCqActions.class);
