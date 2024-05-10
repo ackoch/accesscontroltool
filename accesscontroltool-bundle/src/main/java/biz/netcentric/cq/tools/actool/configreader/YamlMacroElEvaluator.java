@@ -30,6 +30,7 @@ import jakarta.el.ValueExpression;
 import jakarta.el.VariableMapper;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.el.ExpressionFactoryImpl;
 
@@ -119,6 +120,7 @@ public class YamlMacroElEvaluator {
                         
                         StringUtils.class.getMethod("upperCase", new Class<?>[] { String.class }),
                         StringUtils.class.getMethod("lowerCase", new Class<?>[] { String.class }),
+                        StringUtils.class.getMethod("capitalize", new Class<?>[] { String.class }),
                         StringUtils.class.getMethod("substringAfter", new Class<?>[] { String.class, String.class }),
                         StringUtils.class.getMethod("substringBefore", new Class<?>[] { String.class, String.class }),
                         StringUtils.class.getMethod("substringAfterLast", new Class<?>[] { String.class, String.class }),
@@ -134,7 +136,8 @@ public class YamlMacroElEvaluator {
                         YamlMacroElEvaluator.ElFunctionMapper.class.getMethod("containsAllItems", new Class<?>[] { List.class, List.class }),
                         YamlMacroElEvaluator.ElFunctionMapper.class.getMethod("containsAnyItem", new Class<?>[] { List.class, List.class }),
                         YamlMacroElEvaluator.ElFunctionMapper.class.getMethod("keys", new Class<?>[] { Map.class }),
-                        YamlMacroElEvaluator.ElFunctionMapper.class.getMethod("values", new Class<?>[] { Map.class })
+                        YamlMacroElEvaluator.ElFunctionMapper.class.getMethod("values", new Class<?>[] { Map.class }),
+                        YamlMacroElEvaluator.ElFunctionMapper.class.getMethod("escapeXml", new Class<?>[] { String.class })
                 };
                 for (Method method : exportedMethods) {
                     functionMap.put(method.getName(), method);
@@ -170,6 +173,11 @@ public class YamlMacroElEvaluator {
         }
         public static List<Object> values(Map<Object,Object> map) {
             return new ArrayList<>(map.values());
+        }
+        
+        public static String escapeXml(String input) {
+            // DocView is XML 1.0
+            return StringEscapeUtils.escapeXml10(input);
         }
     }
 

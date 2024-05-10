@@ -14,6 +14,7 @@ Function Signature | Description
 `subarray(String array, startIndexInclusive,endIndexExclusive)`|  [`ArrayUtils.subarray(...)`](https://commons.apache.org/proper/commons-lang/apidocs/org/apache/commons/lang3/ArrayUtils.html#subarray-T:A-int-int-)
 `upperCase(String str)`|[`StringUtils.upperCase(...)`](https://commons.apache.org/proper/commons-lang/javadocs/api-3.3/org/apache/commons/lang3/StringUtils.html#upperCase(java.lang.String))
 `lowerCase(String str)`|[`StringUtils.lowerCase(...)`](https://commons.apache.org/proper/commons-lang/javadocs/api-3.3/org/apache/commons/lang3/StringUtils.html#lowerCase(java.lang.String))
+`capitalize(String str)`|[`StringUtils.capitalize(...)`](https://commons.apache.org/proper/commons-lang/javadocs/api-3.3/org/apache/commons/lang3/StringUtils.html#capitalize(java.lang.String))
 `replace(String text, String searchString, String replacement)`|[`StringUtils.replace(...)`](https://commons.apache.org/proper/commons-lang/javadocs/api-3.3/org/apache/commons/lang3/StringUtils.html#replace(java.lang.String,%20java.lang.String,%20java.lang.String))
 `substringAfter(String str, String separator)`|[`StringUtils.substringAfter(...)`](https://commons.apache.org/proper/commons-lang/javadocs/api-3.3/org/apache/commons/lang3/StringUtils.html#substringAfter(java.lang.String,%20java.lang.String))
 `substringBefore(String str, String separator)`|[`StringUtils.substringBefore(...)`](https://commons.apache.org/proper/commons-lang/javadocs/api-3.3/org/apache/commons/lang3/StringUtils.html#substringBefore(java.lang.String,%20java.lang.String))
@@ -24,6 +25,7 @@ Function Signature | Description
 `startsWith(String str, String prefix)`| [`StringUtils.startsWith(...)`](https://commons.apache.org/proper/commons-lang/javadocs/api-3.3/org/apache/commons/lang3/StringUtils.html#startsWith(java.lang.CharSequence,%20java.lang.CharSequence))
 `length(String string)`| [`StringUtils.length(...)`](https://commons.apache.org/proper/commons-lang/javadocs/api-3.3/org/apache/commons/lang3/StringUtils.html#length(java.lang.CharSequence))
 `defaultIfEmpty(String str, String default)` | [`StringUtils.defaultIfEmpty(...)`](https://commons.apache.org/proper/commons-lang/javadocs/api-3.3/org/apache/commons/lang3/StringUtils.html#defaultIfEmpty(T,%20T))
+`escapeXml(String str)` | [`StringEscapeUtils.escapeXml10(...)`](https://commons.apache.org/proper/commons-lang/javadocs/api-3.3/org/apache/commons/lang3/StringEscapeUtils.html#escapeXml10(java.lang.String)), useful for escaping values within `initialContent` which uses [enhanced JCR DocView syntax (an XML 1.0 language)](https://jackrabbit.apache.org/filevault/docview.html).
 `containsItem(List<String> list, String item)`| Returns `true` if the item is contained in the given list.
 `containsAnyItem(List<String> list, List<String> items)`| Returns `true` if any of the items is contained in the given list.
 `containsAllItems(List<String> list, List<String> items)`| Returns `true` if all of the items are contained in the given list (independent of their order).
