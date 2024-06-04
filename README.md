@@ -17,7 +17,7 @@ Features:
 * automatic installation with install hook
 * cleans obsolete ACL entries when configuration is changed
 * ACLs can be exported
-* management of user's key stores and the global trust store
+* management of user's key stores
 * stores history of changes
 * ensured order of ACLs
 * built-in expression language to reduce rule duplication
