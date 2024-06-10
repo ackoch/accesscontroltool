@@ -289,7 +289,8 @@ Certain configuration aspects are global and can be configured on top level:
 
 Property | Description
 --- | ---
-minRequiredVersion | This configuration requires at least the given version of ACL tool. If an older version is found the configuration file is not processed.
+`minRequiredVersion` | This configuration requires at least the given version of ACL tool. If an older version is found the configuration file is not processed.
+`installAclsIncrementally` | Set this to `false` to disable the default [incremental installation](https://github.com/Netcentric/accesscontroltool/issues/155). Only supposed to be used for edge cases (e.g. like forcing external sync for groups already existing in AEM).
 ... | See [Advanced Features](AdvancedFeatures.md) for more global options.
 
 ## Validation
