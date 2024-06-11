@@ -110,6 +110,7 @@ public class IMSUserManagement implements ExternalGroupManagement {
      * 
      */
     static final class TooManyRequestsRetryStrategy implements ServiceUnavailableRetryStrategy {
+        private static final double DEFAULT_MULTIPLIER = 1.5; // increases each time by 50%
         private final int maxRetryCount;
         private final int defaultRetryDelayInSeconds;
         private long retryDelayInMilliseconds;
@@ -134,7 +135,7 @@ public class IMSUserManagement implements ExternalGroupManagement {
                     LOG.info("Received 429 status with Retry-After header {}", retryAfterHeader.getValue());
                 }
                 // make it exponential because the retry-after is unreliable (particularly with multiple requests in parallel)
-                retryDelayInMilliseconds *= executionCount;
+                retryDelayInMilliseconds *= Math.pow(DEFAULT_MULTIPLIER, executionCount);
                 // always add some jitter between 0 and default delay in seconds
                 long jitter= random.nextInt(defaultRetryDelayInSeconds) * 1000l;
                 retryDelayInMilliseconds += jitter;
