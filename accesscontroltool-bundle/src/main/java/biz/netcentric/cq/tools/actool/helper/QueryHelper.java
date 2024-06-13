@@ -42,6 +42,8 @@ import org.apache.jackrabbit.util.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -143,14 +145,9 @@ public class QueryHelper {
         Row row = queryResult.getRows().nextRow();
         // inspired by https://github.com/apache/jackrabbit-oak/blob/cc8adb42d89bc4625138a62ab074e7794a4d39ab/oak-jcr/src/test/java/org/apache/jackrabbit/oak/jcr/query/QueryTest.java#L1092
         String plan = row.getValue("plan").getString();
-        String costJson = plan.substring(plan.lastIndexOf('{'));
-        
-        // use jackson for JSON parsing
-        ObjectMapper mapper = new ObjectMapper();
+        String costJsonStr = plan.substring(plan.lastIndexOf('{'));
 
-        // read the json strings and convert it into JsonNode
-        JsonNode node = mapper.readTree(costJson);
-        double cost = node.get("s").asDouble(Double.MAX_VALUE);
+        double cost = getCostFromJsonStr(costJsonStr);
         // look at https://jackrabbit.apache.org/oak/docs/query/query-engine.html#cost-calculation for the threshold
         // https://github.com/apache/jackrabbit-oak/blob/cc8adb42d89bc4625138a62ab074e7794a4d39ab/oak-core/src/main/java/org/apache/jackrabbit/oak/query/index/TraversingIndex.java#L75
 
@@ -158,6 +155,18 @@ public class QueryHelper {
         // for property index = between 2 and 100
         LOG.debug("Cost for rep:ACL query is estimated with {}", cost);
         return cost <= COST_THRESHOLD_FOR_QUERY_INDEX;
+    }
+
+    static double getCostFromJsonStr(String jsonStr) throws JsonProcessingException, IOException {
+        // use jackson for JSON parsing
+        ObjectMapper mapper = new ObjectMapper().configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+
+        // read the json strings and convert it into JsonNode
+        JsonNode node = mapper.readTree(jsonStr);
+        
+        JsonNode sNode = node.get("s");
+        double cost = sNode.isContainerNode() ? sNode.get("perExecution").asDouble(Double.MAX_VALUE) : sNode.asDouble(Double.MAX_VALUE);
+        return cost;
     }
 
     /** Get Nodes with XPATH Query. */
