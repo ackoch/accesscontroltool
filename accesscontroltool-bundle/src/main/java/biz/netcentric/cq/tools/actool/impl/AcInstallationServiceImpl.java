@@ -638,7 +638,8 @@ public class AcInstallationServiceImpl implements AcInstallationService, AcInsta
                 AcHelper.ACE_ORDER_NONE,
                 Collections.<String>emptyList(), true, session).getAceDump();
 
-        installLog.addMessage(LOG, "Retrieved existing ACLs from repository in " + msHumanReadable(stopWatch.getTime()));
+        installLog.addMessage(LOG, "Retrieved existing ACLs from repository in " + msHumanReadable(stopWatch.getTime()) 
+            + (QueryHelper.hasQueryIndexForACLs(session) ? " using index for rep:ACL nodes": " without additional index for rep:ACL (install oakindex package for better performance!)"));
 
         installAcConfiguration(acConfiguration, installLog, repositoryDumpAceMap, restrictedToPaths, session);
 
