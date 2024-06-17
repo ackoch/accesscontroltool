@@ -42,15 +42,21 @@ import org.apache.jackrabbit.util.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class QueryHelper {
+
     public static final Logger LOG = LoggerFactory.getLogger(QueryHelper.class);
 
     private static final String ROOT_REP_POLICY_NODE = "/rep:policy";
     private static final String ROOT_REPO_POLICY_NODE = "/" + Constants.REPO_POLICY_NODE;
     private static final String HOME_REP_POLICY = "/home/rep:policy";
+
+    private static final String EXPLAIN_QUERY_FOR_ACL_INDEX = "EXPLAIN MEASURE SELECT * FROM [rep:ACL] AS s WHERE ISDESCENDANTNODE([/])";
+    private static final String KEY_COST_PER_EXECUTION = "perExecution";
 
     /** every query cost below that threshold means a dedicated index exists, above that threshold means: fallback to traversal */
     private static final double COST_THRESHOLD_FOR_QUERY_INDEX = 100d;
@@ -108,8 +114,8 @@ public class QueryHelper {
             boolean indexForRepACLExists = false;
             try {
                 indexForRepACLExists = hasQueryIndexForACLs(session);
-            } catch(IOException|RepositoryException e) {
-                LOG.warn("Cannot figure out if query index for rep:ACL nodes exist", e);
+            } catch(Exception e) {
+                LOG.warn("Could not detect if query index for rep:ACL nodes exists: {}", e.getMessage(), e);
             }
             LOG.debug("Index for repACL exists: {}",indexForRepACLExists);
             String queryForAClNodes = indexForRepACLExists ? 
@@ -137,20 +143,16 @@ public class QueryHelper {
         return paths;
     }
 
-    static boolean hasQueryIndexForACLs(final Session session) throws RepositoryException, IOException {
-        Query query = session.getWorkspace().getQueryManager().createQuery("EXPLAIN MEASURE SELECT * FROM [rep:ACL] AS s WHERE ISDESCENDANTNODE([/])", Query.JCR_SQL2);
+    public static boolean hasQueryIndexForACLs(final Session session) throws RepositoryException, IOException {
+        Query query = session.getWorkspace().getQueryManager().createQuery(EXPLAIN_QUERY_FOR_ACL_INDEX, Query.JCR_SQL2);
         QueryResult queryResult = query.execute();
         Row row = queryResult.getRows().nextRow();
         // inspired by https://github.com/apache/jackrabbit-oak/blob/cc8adb42d89bc4625138a62ab074e7794a4d39ab/oak-jcr/src/test/java/org/apache/jackrabbit/oak/jcr/query/QueryTest.java#L1092
         String plan = row.getValue("plan").getString();
-        String costJson = plan.substring(plan.lastIndexOf('{'));
-        
-        // use jackson for JSON parsing
-        ObjectMapper mapper = new ObjectMapper();
+        LOG.debug("Execution plan and cost for {}: {}", EXPLAIN_QUERY_FOR_ACL_INDEX, plan);
+        String costJsonStr = StringUtils.substringAfter(plan, "cost:");
 
-        // read the json strings and convert it into JsonNode
-        JsonNode node = mapper.readTree(costJson);
-        double cost = node.get("s").asDouble(Double.MAX_VALUE);
+        double cost = getCostFromJsonStr(costJsonStr);
         // look at https://jackrabbit.apache.org/oak/docs/query/query-engine.html#cost-calculation for the threshold
         // https://github.com/apache/jackrabbit-oak/blob/cc8adb42d89bc4625138a62ab074e7794a4d39ab/oak-core/src/main/java/org/apache/jackrabbit/oak/query/index/TraversingIndex.java#L75
 
@@ -158,6 +160,21 @@ public class QueryHelper {
         // for property index = between 2 and 100
         LOG.debug("Cost for rep:ACL query is estimated with {}", cost);
         return cost <= COST_THRESHOLD_FOR_QUERY_INDEX;
+    }
+
+    static double getCostFromJsonStr(String jsonStr) throws JsonProcessingException, IOException {
+        // use jackson for JSON parsing
+        ObjectMapper mapper = new ObjectMapper().configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+
+        // read the json strings and convert it into JsonNode
+        JsonNode node = mapper.readTree(jsonStr);
+
+        JsonNode sNode = node.get("s");
+        if(sNode == null || (sNode.isContainerNode() && sNode.get(KEY_COST_PER_EXECUTION) == null)) {
+            throw new IllegalArgumentException("Unexpected json structure for query cost: " + jsonStr);
+        }
+        double cost = sNode.isContainerNode() ? sNode.get(KEY_COST_PER_EXECUTION).asDouble(Double.MAX_VALUE) : sNode.asDouble(Double.MAX_VALUE);
+        return cost;
     }
 
     /** Get Nodes with XPATH Query. */
