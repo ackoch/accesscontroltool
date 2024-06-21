@@ -45,6 +45,7 @@ import biz.netcentric.cq.tools.actool.history.InstallationLogger;
 import biz.netcentric.cq.tools.actool.history.impl.PersistableInstallationLogger;
 import biz.netcentric.cq.tools.actool.slingsettings.ExtendedSlingSettingsService;
 import biz.netcentric.cq.tools.actool.validators.AuthorizableValidator;
+import biz.netcentric.cq.tools.actool.validators.ExternalGroupsInIsMemberOfValidator;
 import biz.netcentric.cq.tools.actool.validators.ConfigurationsValidator;
 import biz.netcentric.cq.tools.actool.validators.GlobalConfigurationValidator;
 import biz.netcentric.cq.tools.actool.validators.ObsoleteAuthorizablesValidator;
@@ -67,6 +68,9 @@ public class YamlConfigurationMerger implements ConfigurationMerger {
 
     @Reference(policyOption = ReferencePolicyOption.GREEDY)
     ObsoleteAuthorizablesValidator obsoleteAuthorizablesValidator;
+
+    @Reference(policyOption = ReferencePolicyOption.GREEDY)
+    ExternalGroupsInIsMemberOfValidator externalGroupsInIsMemberOfValidator;
 
     @Reference(policyOption = ReferencePolicyOption.GREEDY)
     VirtualGroupProcessor virtualGroupProcessor;
@@ -222,7 +226,9 @@ public class YamlConfigurationMerger implements ConfigurationMerger {
         if(!Boolean.TRUE.equals(globalConfiguration.getAllowCreateOfUnmanagedRelationships())) {
             UnmangedExternalMemberRelationshipChecker.validate(acConfiguration);
         }
-        
+
+        externalGroupsInIsMemberOfValidator.validateIsMemberOfConfig(acConfiguration, installLog, globalConfiguration);
+
         installLog.setMergedAndProcessedConfig(
                 "# Merged configuration of " + configFileContentByFilename.size() + " files \n" + acConfiguration);
 
@@ -230,6 +236,7 @@ public class YamlConfigurationMerger implements ConfigurationMerger {
 
         return acConfiguration;
     }
+
 
     private Map<String, Object> getGlobalVariablesForYamlMacroProcessing() {
         Map<String, Object> globalVariables = new HashMap<>();

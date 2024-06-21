@@ -29,6 +29,7 @@ public class GlobalConfiguration {
 
     public static final String KEY_ALLOW_CREATE_OF_UNMANAGED_RELATIONSHIPS = "allowCreateOfUnmanagedRelationships";
 
+    public static final String KEY_ALLOW_EXTERNAL_GROUPS_IN_IS_MEMBER_OF = "allowExternalGroupsInIsMemberOf";
     
     public static final String KEY_AUTOCREATE_TEST_USERS = "autoCreateTestUsers";
 
@@ -42,6 +43,8 @@ public class GlobalConfiguration {
     private Pattern defaultUnmanagedExternalMembersRegex;
     private String defaultUnmanagedAcePathsRegex;
     private Boolean allowCreateOfUnmanagedRelationships = null;
+    
+    private Boolean allowExternalGroupsInIsMemberOf = null;
 
     private AutoCreateTestUsersConfig autoCreateTestUsersConfig;
 
@@ -88,6 +91,11 @@ public class GlobalConfiguration {
             if (globalConfigMap.containsKey(KEY_AUTOCREATE_TEST_USERS)) {
                 autoCreateTestUsersConfig = new AutoCreateTestUsersConfig((Map) globalConfigMap.get(KEY_AUTOCREATE_TEST_USERS));
             }
+            
+            if (globalConfigMap.containsKey(KEY_ALLOW_EXTERNAL_GROUPS_IN_IS_MEMBER_OF)) {
+                setAllowExternalGroupsInIsMemberOf(Boolean.valueOf(globalConfigMap.get(KEY_ALLOW_EXTERNAL_GROUPS_IN_IS_MEMBER_OF).toString()));
+            }
+
         }
 
     }
@@ -144,6 +152,14 @@ public class GlobalConfiguration {
                 autoCreateTestUsersConfig = otherGlobalConfig.getAutoCreateTestUsersConfig();
             } else {
                 throw new IllegalArgumentException("Duplicate config for " + KEY_AUTOCREATE_TEST_USERS);
+            }
+        }
+
+        if (otherGlobalConfig.getAllowExternalGroupsInIsMemberOf() != null) {
+            if (allowExternalGroupsInIsMemberOf == null) {
+                allowExternalGroupsInIsMemberOf = otherGlobalConfig.getAllowExternalGroupsInIsMemberOf();
+            } else {
+                throw new IllegalArgumentException("Duplicate config for " + KEY_ALLOW_EXTERNAL_GROUPS_IN_IS_MEMBER_OF);
             }
         }
 
@@ -205,7 +221,13 @@ public class GlobalConfiguration {
     public AutoCreateTestUsersConfig getAutoCreateTestUsersConfig() {
         return autoCreateTestUsersConfig;
     }
-    
-   
 
+    public Boolean getAllowExternalGroupsInIsMemberOf() {
+        return allowExternalGroupsInIsMemberOf;
+    }
+
+    public void setAllowExternalGroupsInIsMemberOf(Boolean allowExternalGroupsInIsMemberOf) {
+        this.allowExternalGroupsInIsMemberOf = allowExternalGroupsInIsMemberOf;
+    }
+    
 }
