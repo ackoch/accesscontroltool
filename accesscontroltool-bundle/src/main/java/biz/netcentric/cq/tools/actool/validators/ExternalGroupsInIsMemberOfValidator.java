@@ -37,7 +37,7 @@ public class ExternalGroupsInIsMemberOfValidator {
 
             externalGroupsValidationResults.stream().forEach(m -> installLog.addWarning(LOG, m));
 
-            String validationMsg = "Found " + externalGroupsValidationResults.size() + " group(s) that use external groups in isMemberOf. ";
+            String validationMsg = "Found " + externalGroupsValidationResults.size() + " authorizable(s) that use external groups in isMemberOf. ";
 
             if (Boolean.TRUE.equals(globalConfiguration.getAllowExternalGroupsInIsMemberOf())) {
                 installLog.addWarning(LOG, validationMsg);
