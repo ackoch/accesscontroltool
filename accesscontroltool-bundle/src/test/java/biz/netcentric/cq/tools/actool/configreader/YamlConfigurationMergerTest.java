@@ -12,8 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -38,6 +38,7 @@ import biz.netcentric.cq.tools.actool.configmodel.AcConfiguration;
 import biz.netcentric.cq.tools.actool.configmodel.AuthorizableConfigBean;
 import biz.netcentric.cq.tools.actool.configmodel.AuthorizablesConfig;
 import biz.netcentric.cq.tools.actool.history.impl.PersistableInstallationLogger;
+import biz.netcentric.cq.tools.actool.validators.ExternalGroupsInIsMemberOfValidator;
 import biz.netcentric.cq.tools.actool.validators.exceptions.AcConfigBeanValidationException;
 import biz.netcentric.cq.tools.actool.validators.impl.ObsoleteAuthorizablesValidatorImpl;
 
@@ -151,6 +152,7 @@ public class YamlConfigurationMergerTest {
         merger.obsoleteAuthorizablesValidator = new ObsoleteAuthorizablesValidatorImpl();
         merger.virtualGroupProcessor = new VirtualGroupProcessor();
         merger.testUserConfigsCreator = new TestUserConfigsCreator();
+        merger.externalGroupsInIsMemberOfValidator = new ExternalGroupsInIsMemberOfValidator();
         return merger;
     }
 }
